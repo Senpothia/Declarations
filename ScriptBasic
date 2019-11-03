@@ -1,0 +1,67 @@
+REM  *****  BASIC  *****
+
+Sub Main
+
+'--------------          Remplissage du  document    ------------------------
+'
+'**************  Remplissage des informations produit   *********************
+
+Dim monDocument As Object
+Dim lesFeuilles as Object
+Dim maFeuille As Object
+Dim designationProduit As String
+Dim referenceProduit As String 
+Dim fileName As String
+'fileName = "C:\Users\kinte\Declaration2.ods"
+Dim fileNamePdf As String
+'fileNamePdf = "C:\Users\kinte\Declaration_test.pdf"
+Dim i As Integer
+i=0
+
+While designationProduitw<>"EOL"
+
+monDocument = ThisComponent 
+lesFeuilles = monDocument.Sheets 
+maFeuille = lesFeuilles.getByName("References") 
+designationProduit = maFeuille.getCellByposition(0,i).String  ' Prélèvement valeur de designtion produit 
+referenceProduit = maFeuille.getCellByPosition(1,i).String	' Prélèvement valeur de référence produit 
+
+maFeuille = lesFeuilles.getByName("Declaration") 
+maCellule = maFeuille.getCellRangeByName("D7")    ' Transfert désignation produit sur la feuille de la déclaration 
+maCellule.String = designationProduit 
+maCellule = maFeuille.getCellRangeByName("D8")    ' Transfert désignation produit sur la feuille de la déclaration 
+maCellule.String = referenceProduit 
+
+' Enregistrement du document 
+
+Dim Fichier As String  
+Dim Args(0) As New com.sun.star.beans.PropertyValue  
+fileName = "C:\Users\kinte\DC_" & designationProduit & "_A4_FR_01.ods" 
+Fichier = ConvertToURL(fileName)  
+  
+
+  
+ThisComponent.storeAsURL(Fichier, Args()) 
+
+dim propFich(2) as new com.sun.star.beans.PropertyValue
+dim filterProps(0) as new com.sun.star.beans.PropertyValue
+dim adresseDoc  as string
+
+filterProps(0).Name = "Selection"
+filterProps(0).Value = thisComponent.currentController.activeSheet
+
+propFich(0).Name = "FilterName"
+propFich(0).Value = "calc_pdf_Export"
+propFich(1).Name = "FilterData"
+propFich(1).Value = filterProps()
+fileNamePdf = "C:\Users\kinte\DC_" & designationProduit & "_A4_FR_01.pdf" 
+adresseDoc = convertToURL(fileNamePdf)
+thiscomponent.storeToURL(adresseDoc, propfich())
+i=i+1
+
+Wend
+
+MsgBox "Opération terminée"
+
+
+End Sub
