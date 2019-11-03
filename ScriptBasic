@@ -36,7 +36,7 @@ maCellule.String = referenceProduit
 
 Dim Fichier As String  
 Dim Args(0) As New com.sun.star.beans.PropertyValue  
-fileName = "C:\Users\kinte\DC_" & designationProduit & "_A4_FR_01.ods" 
+fileName = "C:\Users\kinte\Documents\Déclarations UE\" & designationProduit & "_A4_FR_01.ods" 
 Fichier = ConvertToURL(fileName)  
   
 
@@ -54,7 +54,7 @@ propFich(0).Name = "FilterName"
 propFich(0).Value = "calc_pdf_Export"
 propFich(1).Name = "FilterData"
 propFich(1).Value = filterProps()
-fileNamePdf = "C:\Users\kinte\DC_" & designationProduit & "_A4_FR_01.pdf" 
+fileNamePdf = "C:\Users\kinte\Documents\Déclarations UE\" & designationProduit & "_A4_FR_01.pdf" 
 adresseDoc = convertToURL(fileNamePdf)
 thiscomponent.storeToURL(adresseDoc, propfich())
 i=i+1
