@@ -1,0 +1,172 @@
+REM  *****  BASIC  *****
+
+Sub Main
+
+'--------------          Remplissage du  document    ------------------------
+'
+'**************  Remplissage des informations produit   *********************
+
+Dim docModele As Object
+Dim lesFeuillesDocModele as Object
+Dim maFeuilleDocModele As Object
+
+Dim docTravail As Object
+Dim lesFeuillesDocTravail as Object
+Dim maFeuilleDocTravail As Object
+
+Dim designationProduit As String
+designationProduit = ""
+Dim referenceProduit As String 
+Dim destinationProduit As String
+destinationProduit = ""
+
+Dim adresseDocModele AS String
+Dim adresseTravail AS String
+adresseDocModele = "C:\Users\kinte\OneDrive\Bureau\DeclarationsUE\Déclarations UE\Modele.ods"
+adresseDocTravail = "C:\Users\kinte\OneDrive\Bureau\DeclarationsUE\Déclarations UE\Travail.ods"
+Dim fileNameInit As String
+Dim fileNameEnd As String
+Dim fileNameRelease As String
+Dim fileName As String
+Dim fileNamePdf As String
+Dim dossierOds As String
+Dim dossierPdf As String
+Dim adresse AS String
+
+Dim Args() 
+Dim i As Integer
+i=0
+Dim j As Integer
+j=0
+
+Dim numNorme As String
+numNorme = ""
+
+Dim numDirective As String
+numDirective = ""
+
+Dim valDate As String
+valDate = ""
+
+dim propFich(2) as new com.sun.star.beans.PropertyValue
+dim filterProps(0) as new com.sun.star.beans.PropertyValue
+dim adresseDoc  as string
+
+filterProps(0).Name = "Selection"
+
+
+propFich(0).Name = "FilterName"
+propFich(0).Value = "calc_pdf_Export"
+propFich(1).Name = "FilterData"
+propFich(1).Value = filterProps() 
+
+' Ouverture document modèle
+
+adresseDocModele = ConvertToUrl(adresseDocModele) 
+docModele = StarDesktop.loadComponentFromURL(adresseDocModele,"_blank",0 ,Args() ) 
+
+lesFeuillesDocModele = docModele.Sheets 
+maFeuilleDocModele = lesFeuillesDocModele.getByName("References") 
+designationProduit = maFeuilleDocModele.getCellByposition(0,i).String  ' Prélèvement valeur de designation produit 
+
+While (designationProduit<>"EOL")
+
+' Ouverture document de Travail
+
+numNorme = ""
+designationProduit = ""
+numDirective = ""
+
+adresseDocTravail = ConvertToUrl(adresseDocTravail) 
+docTravail = StarDesktop.loadComponentFromURL(adresseDocTravail,"_blank",0 ,Args() ) 
+filterProps(0).Value = docTravail.currentController.activeSheet
+
+' Modification document de Travail - Partie références 
+
+lesFeuillesDocModele = docModele.Sheets 
+maFeuilleDocModele = lesFeuillesDocModele.getByName("References") 
+designationProduit = maFeuilleDocModele.getCellByposition(0,i).String  ' Prélèvement valeur de designation produit 
+
+referenceProduit = maFeuilleDocModele.getCellByPosition(1,i).String	' Prélèvement valeur de référence produit 
+destinationProduit = maFeuilleDocModele.getCellByPosition(2,i).String	' Prélèvement valeur de la destination
+
+lesFeuillesDocTravail = docTravail.Sheets 
+maFeuilleDocTravail = lesFeuillesDocTravail.getByName("Declaration") 
+
+maCellule = maFeuilleDocTravail.getCellRangeByName("D7")    ' Transfert désignation produit sur la feuille de la déclaration 
+maCellule.String = designationProduit 
+maCellule = maFeuilleDocTravail.getCellRangeByName("D8")    ' Transfert désignation produit sur la feuille de la déclaration 
+maCellule.String = referenceProduit 
+maCellule = maFeuilleDocTravail.getCellRangeByName("D9")    ' Transfert désignation produit sur la feuille de la destination 
+maCellule.String = destinationProduit 
+
+' Modification document de Travail - Partie Directives
+
+maFeuilleDocModele = lesFeuillesDocModele.getByName("Directives")
+numDirective = maFeuilleDocModele.getCellByposition(0,j).String
+While (numDirective<>"EOL")
+maCellule = maFeuilleDocTravail.getCellByPosition(1,16+j)
+maCellule.String = numDirective
+j=j+1
+numDirective = maFeuilleDocModele.getCellByposition(0,j).String
+Wend
+j=0
+
+' Modification document de Travail - Partie Normes
+
+maFeuilleDocModele = lesFeuillesDocModele.getByName("Normes")
+numNorme = maFeuilleDocModele.getCellByposition(0,j).String
+While (numNorme<>"EOL")
+maCellule = maFeuilleDocTravail.getCellByPosition(1,23+j)
+maCellule.String = numNorme
+j=j+1
+numNorme = maFeuilleDocModele.getCellByposition(0,j).String
+Wend
+j=0
+
+'Modification de la date - adresse - désignation
+
+maFeuilleDocModele = lesFeuillesDocModele.getByName("Config")
+
+fileNameRelease = maFeuilleDocModele.getCellByposition(1,0).String
+valDate = maFeuilleDocModele.getCellByposition(1,1).String
+fileNameInit = maFeuilleDocModele.getCellByposition(1,2).String
+fileNameEnd = maFeuilleDocModele.getCellByposition(1,3).String
+dossierOds = maFeuilleDocModele.getCellByposition(1,4).String
+dossierPdf = maFeuilleDocModele.getCellByposition(1,5).String
+adresse = maFeuilleDocModele.getCellByposition(1,6).String
+
+maCellule = maFeuilleDocTravail.getCellRangeByName("C32")    '  
+maCellule.String = valDate
+maCellule = maFeuilleDocTravail.getCellRangeByName("D6")    '  
+maCellule.String = adresse
+
+' Sauvegarde document de Travail
+
+Dim Fichier As String  
+'Dim Args(0) As New com.sun.star.beans.PropertyValue  
+fileName = dossierOds & fileNameInit & "_" & designationProduit & "_" & fileNameRelease & fileNameEnd & ".ods" 
+Fichier = ConvertToURL(fileName)  
+  
+  
+docTravail.storeAsURL(Fichier, Args()) 
+
+
+fileNamePdf = dossierPdf & fileNameInit & "_" & designationProduit & "_" & fileNameRelease & fileNameEnd & ".pdf"
+adresseDoc = convertToURL(fileNamePdf)
+docTravail.storeToURL(adresseDoc, propfich())
+
+' Fermeture document de Travail
+
+docTravail.close(true)
+i=i+1
+maFeuilleDocModele = lesFeuillesDocModele.getByName("References") 
+designationProduit = maFeuilleDocModele.getCellByposition(0,i).String  ' Prélèvement valeur de designation produit 
+
+Wend
+docModele.close(true)
+i=0
+MsgBox "Génération terminée"
+
+End Sub
+
